@@ -1,0 +1,26 @@
+target/
+cmake-build-release/
+cmake-build-debug/
+local/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.metals
+.vscode
+*.DS_Store
+*.log
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### input and output
+*.input
+*.output
