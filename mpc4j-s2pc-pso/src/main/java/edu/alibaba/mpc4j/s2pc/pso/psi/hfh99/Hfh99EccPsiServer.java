@@ -70,6 +70,47 @@ public class Hfh99EccPsiServer<T> extends AbstractPsiServer<T> {
     }
 
     @Override
+    public List<byte[]>[] psi_1(int maxServerElementSize, int maxClientElementSize, Set<T> serverElementSet, int clientElementSize, List<byte[]> hyBetaPayload) throws MpcAbortException {
+        setInitInput(maxServerElementSize, maxClientElementSize);
+        info("{}{} Server Init begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());
+
+        stopWatch.start();
+        // 生成α
+        alpha = ecc.randomZn(secureRandom);
+        stopWatch.stop();
+        long initTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        stopWatch.reset();
+        info("{}{} Server Init Step 1/1 ({}ms)", ptoStepLogPrefix, getPtoDesc().getPtoName(), initTime);
+
+        initialized = true;
+        info("{}{} Server Init end", ptoEndLogPrefix, getPtoDesc().getPtoName());
+
+        setPtoInput(serverElementSet, clientElementSize);
+        info("{}{} Send. begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());
+
+        stopWatch.start();
+        int peqtByteLength = PsiUtils.getSemiHonestPeqtByteLength(serverElementSize, clientElementSize);
+        peqtHash = HashFactory.createInstance(envType, peqtByteLength);
+        List<byte[]> hxAlphaPayload = generateHxAlphaPayload();
+
+        stopWatch.stop();
+        long hxAlphaTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        stopWatch.reset();
+        info("{}{} Server Step 1/2 ({}ms)", ptoStepLogPrefix, getPtoDesc().getPtoName(), hxAlphaTime);
+
+        stopWatch.start();
+        List<byte[]> peqtPayload = handleHyBetaPayload(hyBetaPayload);
+        stopWatch.stop();
+        long peqtTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        stopWatch.reset();
+        info("{}{} Server Step 2/2 ({}ms)", ptoStepLogPrefix, getPtoDesc().getPtoName(), peqtTime);
+
+        info("{}{} Server end", ptoEndLogPrefix, getPtoDesc().getPtoName());
+
+        return (List<byte[]>[]) new List[]{hxAlphaPayload, peqtPayload};
+    }
+
+    @Override
     public void psi(Set<T> serverElementSet, int clientElementSize) throws MpcAbortException {
         setPtoInput(serverElementSet, clientElementSize);
         info("{}{} Send. begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());
@@ -96,8 +137,10 @@ public class Hfh99EccPsiServer<T> extends AbstractPsiServer<T> {
             otherParty().getPartyId(), ownParty().getPartyId()
         );
         List<byte[]> hyBetaPayload = rpc.receive(hyBetaHeader).getPayload();
+
         // 服务端计算并发送H(y)^βα
         List<byte[]> peqtPayload = handleHyBetaPayload(hyBetaPayload);
+
         DataPacketHeader peqtHeader = new DataPacketHeader(
             taskId, getPtoDesc().getPtoId(), PtoStep.CLIENT_SEND_HY_BETA_ALPHA.ordinal(), extraInfo,
             ownParty().getPartyId(), otherParty().getPartyId()

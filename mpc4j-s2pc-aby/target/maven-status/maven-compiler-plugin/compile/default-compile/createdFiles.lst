@@ -1,0 +1,16 @@
+edu/alibaba/mpc4j/s2pc/aby/bc/BcSquareVector.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcVector.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcSender.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcFactory.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcConfig.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcPtoDesc$PtoStep.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcReceiver.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcFactory$BcType.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcConfig$1.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcParty$1.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcFactory$1.class
+edu/alibaba/mpc4j/s2pc/aby/bc/BcParty.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcConfig$Builder.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcPtoDesc.class
+edu/alibaba/mpc4j/s2pc/aby/bc/AbstractBcParty.class
+edu/alibaba/mpc4j/s2pc/aby/bc/bea91/Bea91BcConfig.class

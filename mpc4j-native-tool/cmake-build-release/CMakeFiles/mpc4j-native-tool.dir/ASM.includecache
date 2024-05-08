@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/marco/mpc4j-1.0.4/mpc4j/mpc4j-native-tool/crypto/blake3/blake3_avx2_x86-64_unix.S
+cet.h
+-
+
+/home/marco/mpc4j-1.0.4/mpc4j/mpc4j-native-tool/crypto/blake3/blake3_avx512_x86-64_unix.S
+cet.h
+-
+
+/home/marco/mpc4j-1.0.4/mpc4j/mpc4j-native-tool/crypto/blake3/blake3_sse2_x86-64_unix.S
+cet.h
+-
+
+/home/marco/mpc4j-1.0.4/mpc4j/mpc4j-native-tool/crypto/blake3/blake3_sse41_x86-64_unix.S
+cet.h
+-
+

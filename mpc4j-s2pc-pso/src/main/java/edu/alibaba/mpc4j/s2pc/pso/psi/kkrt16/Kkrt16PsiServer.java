@@ -117,6 +117,11 @@ public class Kkrt16PsiServer<T> extends AbstractPsiServer<T> {
     }
 
     @Override
+    public List<byte[]>[] psi_1(int maxServerElementSize, int maxClientElementSize, Set<T> serverElementSet, int clientElementSize, List<byte[]> hyBetaPayload) throws MpcAbortException {
+        return null;
+    }
+
+    @Override
     public void psi(Set<T> serverElementSet, int clientElementSize) throws MpcAbortException {
         setPtoInput(serverElementSet, clientElementSize);
         info("{}{} Send. begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());

@@ -84,8 +84,8 @@ public class Hfh99EccPsiClient<T> extends AbstractPsiClient<T> {
         // 客户端计算并发送H(y)^β
         List<byte[]> hyBetaPayload = generateHyBetaPayload();
         DataPacketHeader hyBetaHeader = new DataPacketHeader(
-            taskId, getPtoDesc().getPtoId(), PtoStep.CLIENT_SEND_HY_BETA.ordinal(), extraInfo,
-            ownParty().getPartyId(), otherParty().getPartyId()
+                taskId, getPtoDesc().getPtoId(), PtoStep.CLIENT_SEND_HY_BETA.ordinal(), extraInfo,
+                ownParty().getPartyId(), otherParty().getPartyId()
         );
         rpc.send(DataPacket.fromByteArrayList(hyBetaHeader, hyBetaPayload));
         stopWatch.stop();
@@ -96,18 +96,81 @@ public class Hfh99EccPsiClient<T> extends AbstractPsiClient<T> {
         stopWatch.start();
         // 客户端接收H(x)^α
         DataPacketHeader hxAlphaHeader = new DataPacketHeader(
-            taskId, getPtoDesc().getPtoId(), PtoStep.SERVER_SEND_HX_ALPHA.ordinal(), extraInfo,
-            otherParty().getPartyId(), ownParty().getPartyId()
+                taskId, getPtoDesc().getPtoId(), PtoStep.SERVER_SEND_HX_ALPHA.ordinal(), extraInfo,
+                otherParty().getPartyId(), ownParty().getPartyId()
         );
         List<byte[]> hxAlphaPayload = rpc.receive(hxAlphaHeader).getPayload();
+
         // 客户端计算H(H(x)^αβ)
         Set<ByteBuffer> peqtSet = handleHxAlphaPayload(hxAlphaPayload);
         // 客户端接收H(H(y)^βα)
         DataPacketHeader peqtHeader = new DataPacketHeader(
-            taskId, getPtoDesc().getPtoId(), PtoStep.CLIENT_SEND_HY_BETA_ALPHA.ordinal(), extraInfo,
-            otherParty().getPartyId(), ownParty().getPartyId()
+                taskId, getPtoDesc().getPtoId(), PtoStep.CLIENT_SEND_HY_BETA_ALPHA.ordinal(), extraInfo,
+                otherParty().getPartyId(), ownParty().getPartyId()
         );
         List<byte[]> peqtPayload = rpc.receive(peqtHeader).getPayload();
+
+        Set<T> intersection = handlePeqtPayload(peqtPayload, peqtSet);
+        stopWatch.stop();
+        long peqtTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        stopWatch.reset();
+        info("{}{} Client Step 2/2 ({}ms)", ptoStepLogPrefix, getPtoDesc().getPtoName(), peqtTime);
+
+        info("{}{} Client end", ptoEndLogPrefix, getPtoDesc().getPtoName());
+
+        return intersection;
+    }
+
+    @Override
+    public BigInteger psi_1(int maxClientElementSize, int maxServerElementSize, Set<T> clientElementSet, int serverElementSize) {
+        setInitInput(maxClientElementSize, maxServerElementSize);
+        info("{}{} Client Init begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());
+
+        stopWatch.start();
+        // 生成β
+        beta = ecc.randomZn(secureRandom);
+        stopWatch.stop();
+        long initTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        stopWatch.reset();
+        info("{}{} Client Init Step 1/1 ({}ms)", ptoStepLogPrefix, getPtoDesc().getPtoName(), initTime);
+
+        initialized = true;
+        info("{}{} Client Init end", ptoEndLogPrefix, getPtoDesc().getPtoName());
+
+        setPtoInput(clientElementSet, serverElementSize);
+        info("{}{} Client begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());
+
+        return beta;
+    }
+
+    @Override
+    public List<byte[]> psi_2(int serverElementSize, int clientElementSize) {
+        int peqtByteLength = PsiUtils.getSemiHonestPeqtByteLength(serverElementSize, clientElementSize);
+        peqtHash = HashFactory.createInstance(envType, peqtByteLength);
+        stopWatch.start();
+        List<byte[]> hyBetaPayload = generateHyBetaPayload();
+
+        stopWatch.stop();
+        long hyBetaTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        stopWatch.reset();
+        info("{}{} Client Step 1/2 ({}ms)", ptoStepLogPrefix, getPtoDesc().getPtoName(), hyBetaTime);
+
+        return hyBetaPayload;
+    }
+
+    @Override
+    public Set<T> psi_3(int maxClientElementSize, int maxServerElementSize, Set<T> clientElementSet, int serverElementSize, BigInteger _beta, List<List<byte[]>> result) throws MpcAbortException {
+        setInitInput(maxClientElementSize, maxServerElementSize);
+        beta = _beta;
+        initialized = true;
+        setPtoInput(clientElementSet, serverElementSize);
+        int peqtByteLength = PsiUtils.getSemiHonestPeqtByteLength(serverElementSize, clientElementSize);
+        peqtHash = HashFactory.createInstance(envType, peqtByteLength);
+
+        List<byte[]> hxAlphaPayload = result.get(0);
+        List<byte[]> peqtPayload = result.get(1);
+        stopWatch.start();
+        Set<ByteBuffer> peqtSet = handleHxAlphaPayload(hxAlphaPayload);
         Set<T> intersection = handlePeqtPayload(peqtPayload, peqtSet);
         stopWatch.stop();
         long peqtTime = stopWatch.getTime(TimeUnit.MILLISECONDS);

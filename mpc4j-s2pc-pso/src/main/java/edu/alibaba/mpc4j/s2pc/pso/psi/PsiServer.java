@@ -3,8 +3,11 @@ package edu.alibaba.mpc4j.s2pc.pso.psi;
 import edu.alibaba.mpc4j.common.rpc.MpcAbortException;
 import edu.alibaba.mpc4j.common.rpc.pto.SecurePto;
 import edu.alibaba.mpc4j.common.rpc.pto.TwoPartyPto;
+import edu.alibaba.mpc4j.common.tool.crypto.hash.HashFactory;
 
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * PSI协议服务端接口。
@@ -38,4 +41,6 @@ public interface PsiServer<T> extends TwoPartyPto, SecurePto {
      * @throws MpcAbortException 如果协议异常中止。
      */
     void psi(Set<T> serverElementSet, int clientElementSize) throws MpcAbortException;
+
+    List<byte[]>[] psi_1(int maxServerElementSize, int maxClientElementSize, Set<T> serverElementSet, int clientElementSize, List<byte[]> hyBetaPayload) throws MpcAbortException;
 }

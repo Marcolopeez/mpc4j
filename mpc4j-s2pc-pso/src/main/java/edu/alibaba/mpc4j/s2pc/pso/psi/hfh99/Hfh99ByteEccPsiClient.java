@@ -15,6 +15,7 @@ import edu.alibaba.mpc4j.s2pc.pso.psi.AbstractPsiClient;
 import edu.alibaba.mpc4j.s2pc.pso.psi.hfh99.Hfh99ByteEccPsiPtoDesc.PtoStep;
 import edu.alibaba.mpc4j.s2pc.pso.psi.PsiUtils;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +111,21 @@ public class Hfh99ByteEccPsiClient<T> extends AbstractPsiClient<T> {
 
         info("{}{} Client end", ptoEndLogPrefix, getPtoDesc().getPtoName());
         return intersection;
+    }
+
+    @Override
+    public BigInteger psi_1(int maxClientElementSize, int maxServerElementSize, Set<T> clientElementSet, int serverElementSize) {
+        return null;
+    }
+
+    @Override
+    public List<byte[]> psi_2(int serverElementSize, int clientElementSize) {
+        return null;
+    }
+
+    @Override
+    public Set<T> psi_3(int maxClientElementSize, int maxServerElementSize, Set<T> clientElementSet, int serverElementSize, BigInteger _beta, List<List<byte[]>> result) throws MpcAbortException {
+        return null;
     }
 
     private List<byte[]> generateHyBetaPayload() {

@@ -1,0 +1,7 @@
+edu/alibaba/mpc4j/common/jnagmp/LibGmp$SizeT4.class
+edu/alibaba/mpc4j/common/jnagmp/GmpBigInteger.class
+edu/alibaba/mpc4j/common/jnagmp/GmpBigInteger$MpzMemory.class
+edu/alibaba/mpc4j/common/jnagmp/Gmp.class
+edu/alibaba/mpc4j/common/jnagmp/LibGmp$SizeT8.class
+edu/alibaba/mpc4j/common/jnagmp/LibGmp.class
+edu/alibaba/mpc4j/common/jnagmp/LibGmp$mpz_t.class
