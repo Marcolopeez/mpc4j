@@ -1,7 +1,10 @@
 target/
 cmake-build-release/
 cmake-build-debug/
+mpc4j-native-fhe/cmake-build-release/
+mpc4j-native-tool/cmake-build-release/
 local/
+.mvn/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -14,6 +17,25 @@ local/
 .vscode
 *.DS_Store
 *.log
+
+# CMake y logs
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeOutput.log
+CMakeDirectoryInformation.cmake
+makefile.cmake
+
+# Compilación C/C++
+*.a
+*.o
+*.obj
+*.exe
+*.dll
+*.out
+*.d
+*.marks
 
 ### IntelliJ IDEA ###
 .idea
