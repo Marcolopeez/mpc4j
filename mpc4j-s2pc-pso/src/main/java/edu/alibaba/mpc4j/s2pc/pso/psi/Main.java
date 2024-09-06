@@ -28,8 +28,8 @@ public class Main {
         // Set VM options to link to the native libraries
         setVMOptions();
 
-        byte[] bytesClientSet = hexStringToByteArray("00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003");
-        byte[] bytesServerSet = hexStringToByteArray("00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004");
+        byte[] bytesClientSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab354b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8aef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d");
+        byte[] bytesServerSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f09196837902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451");
         Set<ByteBuffer> clientSet = convertByteArrayToByteBufferSet(bytesClientSet);
         Set<ByteBuffer> serverSet = convertByteArrayToByteBufferSet(bytesServerSet);
 
