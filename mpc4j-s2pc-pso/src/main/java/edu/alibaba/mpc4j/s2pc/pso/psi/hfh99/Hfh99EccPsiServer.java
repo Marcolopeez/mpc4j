@@ -72,22 +72,6 @@ public class Hfh99EccPsiServer<T> extends AbstractPsiServer<T> {
 
     @Override
     public List<byte[]>[] psi_1(int maxServerElementSize, int maxClientElementSize, Set<T> serverElementSet, int clientElementSize, List<byte[]> hyBetaPayload) throws MpcAbortException {
-        StringBuilder hexString = new StringBuilder("0x");
-        for (T element : serverElementSet) {
-            if (element instanceof ByteBuffer) {
-                ByteBuffer byteBuffer = (ByteBuffer) element; // Cast seguro a ByteBuffer
-                byte[] bytes = new byte[byteBuffer.remaining()]; // Usa remaining() para obtener el tamaño correcto
-                byteBuffer.duplicate().get(bytes); // Usa duplicate() para evitar modificar la posición original
-                for (byte b : bytes) {
-                    hexString.append(String.format("%02X", b));
-                }
-            } else {
-                // Manejo de caso si el elemento no es un ByteBuffer (esto no debería ocurrir si T siempre es ByteBuffer)
-                throw new ClassCastException("Element is not an instance of ByteBuffer");
-            }
-        }
-        info("ServerSet: {}", hexString.toString().trim());
-
         setInitInput(maxServerElementSize, maxClientElementSize);
         info("{}{} Server Init begin", ptoBeginLogPrefix, getPtoDesc().getPtoName());
 

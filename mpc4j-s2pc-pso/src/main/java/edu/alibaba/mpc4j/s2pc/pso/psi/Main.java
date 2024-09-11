@@ -28,8 +28,8 @@ public class Main {
         // Set VM options to link to the native libraries
         setVMOptions();
 
-        byte[] bytesClientSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab354b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8aef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d");
-        byte[] bytesServerSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f09196837902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451");
+        byte[] bytesClientSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab354b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8aef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b24512c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3");
+        byte[] bytesServerSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f09196834FC82B26AECB47D2868C4EFBE3581732A3E7CBCC6C2EFB32062C08170A05EEB87902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b245119581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7");
         Set<ByteBuffer> clientSet = convertByteArrayToByteBufferSet(bytesClientSet);
         Set<ByteBuffer> serverSet = convertByteArrayToByteBufferSet(bytesServerSet);
 
@@ -58,14 +58,13 @@ public class Main {
 
             List<byte[]>[] result = server.psi_1(serverSet.size(), clientSet.size(), serverSet, clientSet.size(), reconstructedBeta);
 
-            String alphaHexString = bytesListToHexString(result[0]);
+            String hxAlphaHexString = bytesListToHexString(result[0]);
             String peqtHexString = bytesListToHexString(result[1]);
-            LOGGER.info("Alpha received: " + alphaHexString);
+            LOGGER.info("hxAlpha received: " + hxAlphaHexString);
             LOGGER.info("peqt received: " + peqtHexString);
             //--------------------------------------------------------------------------------------------------------------------------
-            //List<byte[]>[] reconstructedResult = new List[]{hexStringToBytesList(alphaHexString),hexStringToBytesList(peqtHexString)};
             List<List<byte[]>> reconstructedResult = new ArrayList<>();
-            reconstructedResult.add(hexStringToBytesList(alphaHexString));
+            reconstructedResult.add(hexStringToBytesList(hxAlphaHexString));
             reconstructedResult.add(hexStringToBytesList(peqtHexString));
 
             Set<ByteBuffer> intersectionSet = client.psi_3(clientSet.size(), serverSet.size(), clientSet, serverSet.size(), new BigInteger(betaString), reconstructedResult);
@@ -75,35 +74,6 @@ public class Main {
             LOGGER.error("Ocurrió un error: " + e.getMessage(), e);
         }
         System.exit(0);
-    }
-
-    public static void compareByteArrayLists(List<byte[]> list1, List<byte[]> list2) {
-        if (list1.size() != list2.size()) {
-            System.out.println("Las listas tienen diferente tamaño:");
-            System.out.println("Lista 1 size: " + list1.size());
-            System.out.println("Lista 2 size: " + list2.size());
-            return;
-        }
-
-        boolean isEqual = true;
-
-        for (int i = 0; i < list1.size(); i++) {
-            byte[] byteArray1 = list1.get(i);
-            byte[] byteArray2 = list2.get(i);
-
-            if (!Arrays.equals(byteArray1, byteArray2)) {
-                isEqual = false;
-                System.out.println("Diferencia encontrada en el índice " + i + ":");
-                System.out.println("Lista 1: " + Arrays.toString(byteArray1));
-                System.out.println("Lista 2: " + Arrays.toString(byteArray2));
-            }
-        }
-
-        if (isEqual) {
-            System.out.println("Las listas son idénticas.");
-        } else {
-            System.out.println("Las listas son diferentes.");
-        }
     }
 
     private static void setVMOptions() {
