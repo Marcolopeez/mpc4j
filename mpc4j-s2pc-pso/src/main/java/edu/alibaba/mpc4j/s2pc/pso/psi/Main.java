@@ -20,7 +20,7 @@ import com.google.common.base.Splitter;
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public static void main(final String[] args) throws Exception {LOGGER.info("read log config");
+    public static void main(final String[] args) throws Exception {
         Properties log4jProperties = new Properties();
         log4jProperties.load(Main.class.getResourceAsStream("/log4j.properties"));
         PropertyConfigurator.configure(log4jProperties);
@@ -28,48 +28,80 @@ public class Main {
         // Set VM options to link to the native libraries
         setVMOptions();
 
-        byte[] bytesClientSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab354b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8aef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b24512c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3");
-        byte[] bytesServerSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f09196834FC82B26AECB47D2868C4EFBE3581732A3E7CBCC6C2EFB32062C08170A05EEB87902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b245119581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7");
-        Set<ByteBuffer> clientSet = convertByteArrayToByteBufferSet(bytesClientSet);
-        Set<ByteBuffer> serverSet = convertByteArrayToByteBufferSet(bytesServerSet);
+        byte[] bytesAliceSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab354b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8aef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b24512c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3");
+        byte[] bytesBobSet = hexStringToByteArray("d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f09196834FC82B26AECB47D2868C4EFBE3581732A3E7CBCC6C2EFB32062C08170A05EEB87902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b245119581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7");
+        Set<ByteBuffer> aliceSet = convertByteArrayToByteBufferSet(bytesAliceSet);
+        Set<ByteBuffer> bobSet = convertByteArrayToByteBufferSet(bytesBobSet);
 
         PsiConfig config = buildPsiType(args[0]);
-
         RpcManager rpcManager = new MemoryRpcManager(2);
-        Rpc serverRpc = rpcManager.getRpc(0);
-        Rpc clientRpc = rpcManager.getRpc(1);
-        PsiServer<ByteBuffer> server = PsiFactory.createServer(serverRpc, clientRpc.ownParty(), config);
-        PsiClient<ByteBuffer> client = PsiFactory.createClient(clientRpc, serverRpc.ownParty(), config);
+        PsiServer<ByteBuffer> server = PsiFactory.createServer(rpcManager.getRpc(0), rpcManager.getRpc(1).ownParty(), config);
+        PsiClient<ByteBuffer> client = PsiFactory.createClient(rpcManager.getRpc(1), rpcManager.getRpc(0).ownParty(), config);
 
         server.setTaskId(5);
         client.setTaskId(5);
 
         try {
-            //--------------------------------------------------------------------------------------------------------------------------
-            BigInteger beta = client.psi_1(clientSet.size(), serverSet.size(), clientSet, serverSet.size());
-            List<byte[]> hyBetaPayload = client.psi_2(serverSet.size(), clientSet.size());
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            LOGGER.info("Alice executes CLIENT-PSI STEPs 1 & 2:");
+            BigInteger beta_Alice = client.psi_1(aliceSet.size(), bobSet.size(), aliceSet, bobSet.size());
+            List<byte[]> hyBetaPayload_Alice = client.psi_2(bobSet.size(), aliceSet.size());
 
-            String betaString = beta.toString();
-            String hyBetaHexString = bytesListToHexString(hyBetaPayload);
-            LOGGER.info("beta received: " + betaString);
-            LOGGER.info("hyBeta received: " + hyBetaHexString);
-            //--------------------------------------------------------------------------------------------------------------------------
-            List<byte[]> reconstructedBeta = hexStringToBytesList(hyBetaHexString);
+            String betaString_Alice = beta_Alice.toString();
+            String hyBetaHexString_Alice = bytesListToHexString(hyBetaPayload_Alice);
+            LOGGER.info("beta_Alice received: " + betaString_Alice);
+            LOGGER.info("hyBeta_Alice received: " + hyBetaHexString_Alice);
+            List<byte[]> reconstructedBeta_Alice = hexStringToBytesList(hyBetaHexString_Alice);
 
-            List<byte[]>[] result = server.psi_1(serverSet.size(), clientSet.size(), serverSet, clientSet.size(), reconstructedBeta);
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            LOGGER.info("Bob executes CLIENT-PSI STEPs 1 & 2:");
+            BigInteger beta_Bob = client.psi_1(bobSet.size(), aliceSet.size(), bobSet, aliceSet.size());
+            List<byte[]> hyBetaPayload_Bob = client.psi_2(aliceSet.size(), bobSet.size());
 
-            String hxAlphaHexString = bytesListToHexString(result[0]);
-            String peqtHexString = bytesListToHexString(result[1]);
-            LOGGER.info("hxAlpha received: " + hxAlphaHexString);
-            LOGGER.info("peqt received: " + peqtHexString);
-            //--------------------------------------------------------------------------------------------------------------------------
-            List<List<byte[]>> reconstructedResult = new ArrayList<>();
-            reconstructedResult.add(hexStringToBytesList(hxAlphaHexString));
-            reconstructedResult.add(hexStringToBytesList(peqtHexString));
+            String betaString_Bob = beta_Bob.toString();
+            String hyBetaHexString_Bob = bytesListToHexString(hyBetaPayload_Bob);
+            LOGGER.info("beta_Bob received: " + betaString_Bob);
+            LOGGER.info("hyBeta_Bob received: " + hyBetaHexString_Bob);
+            List<byte[]> reconstructedBeta_Bob = hexStringToBytesList(hyBetaHexString_Bob);
 
-            Set<ByteBuffer> intersectionSet = client.psi_3(clientSet.size(), serverSet.size(), clientSet, serverSet.size(), new BigInteger(betaString), reconstructedResult);
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            LOGGER.info("Bob executes Server-PSI STEP 1:");
+            List<byte[]>[] result_Bob = server.psi_1(bobSet.size(), aliceSet.size(), bobSet, aliceSet.size(), reconstructedBeta_Alice);
 
-            LOGGER.info("Intersection: {}", setToString(intersectionSet));
+            String hxAlphaHexString_Bob = bytesListToHexString(result_Bob[0]);
+            String peqtHexString_Bob = bytesListToHexString(result_Bob[1]);
+            LOGGER.info("hxAlpha_Bob received: " + hxAlphaHexString_Bob);
+            LOGGER.info("peqt_Bob received: " + peqtHexString_Bob);
+
+            List<List<byte[]>> reconstructedResult_Bob = new ArrayList<>();
+            reconstructedResult_Bob.add(hexStringToBytesList(hxAlphaHexString_Bob));
+            reconstructedResult_Bob.add(hexStringToBytesList(peqtHexString_Bob));
+
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            LOGGER.info("Alice executes Server-PSI STEP 1:");
+            List<byte[]>[] result_Alice = server.psi_1(aliceSet.size(), bobSet.size(), aliceSet, bobSet.size(), reconstructedBeta_Bob);
+
+            String hxAlphaHexString_Alice = bytesListToHexString(result_Alice[0]);
+            String peqtHexString_Alice = bytesListToHexString(result_Alice[1]);
+            LOGGER.info("hxAlpha_Alice received: " + hxAlphaHexString_Alice);
+            LOGGER.info("peqt_Alice received: " + peqtHexString_Alice);
+
+            List<List<byte[]>> reconstructedResult_Alice = new ArrayList<>();
+            reconstructedResult_Alice.add(hexStringToBytesList(hxAlphaHexString_Alice));
+            reconstructedResult_Alice.add(hexStringToBytesList(peqtHexString_Alice));
+
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            LOGGER.info("Alice executes CLIENT-PSI STEP 3:");
+            Set<ByteBuffer> intersectionSet_Alice = client.psi_3(aliceSet.size(), bobSet.size(), aliceSet, bobSet.size(), new BigInteger(betaString_Alice), reconstructedResult_Bob);
+
+            LOGGER.info("Intersection_Alice: {}", setToString(intersectionSet_Alice));
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+            LOGGER.info("Bob executes CLIENT-PSI STEP 3:");
+            Set<ByteBuffer> intersectionSet_Bob = client.psi_3(bobSet.size(), aliceSet.size(), bobSet, aliceSet.size(), new BigInteger(betaString_Bob), reconstructedResult_Alice);
+
+            LOGGER.info("Intersection_Bob: {}", setToString(intersectionSet_Bob));
+            LOGGER.info("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         } catch (Exception e) {
             LOGGER.error("Ocurrió un error: " + e.getMessage(), e);
         }
@@ -140,7 +172,7 @@ public class Main {
         StringBuilder hexString = new StringBuilder("0x");
         for (ByteBuffer byteBuffer : set) {
             byte[] bytes = new byte[byteBuffer.limit()];
-            byteBuffer.rewind();
+            byteBuffer.position(0); 
             byteBuffer.get(bytes);
             for (byte b : bytes) {
                 hexString.append(String.format("%02X", b));
